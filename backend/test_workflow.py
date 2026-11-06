@@ -15,7 +15,7 @@ async def run_full_workflow_test():
     seed_database_internal(db)
     db.close()
 
-    async with httpx.AsyncClient(base_url="http://127.0.0.1:8000", timeout=15.0) as client:
+    async with httpx.AsyncClient(base_url="http://127.0.0.1:8001", timeout=15.0) as client:
         # Check Health
         health_res = await client.get("/api/health")
         assert health_res.status_code == 200, f"Health check failed: {health_res.text}"
