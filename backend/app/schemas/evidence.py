@@ -1,6 +1,6 @@
 from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.schemas.auth import UserResponse
 
 class EvidenceCreate(BaseModel):
@@ -14,6 +14,8 @@ class EvidenceVerifyRequest(BaseModel):
     remarks: Optional[str] = None
 
 class EvidenceResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     issue_group_id: str
     uploaded_by_id: str
@@ -24,7 +26,3 @@ class EvidenceResponse(BaseModel):
     verified_at: Optional[datetime] = None
     created_at: datetime
     uploaded_by: Optional[UserResponse] = None
-
-    class Config:
-        from_attributes = True
-

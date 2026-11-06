@@ -1,10 +1,12 @@
 from typing import Optional, List
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.schemas.category import CategoryResponse
 from app.schemas.auth import UserResponse
 
 class StatusHistoryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     issue_group_id: str
     changed_by_user_id: str
@@ -14,10 +16,9 @@ class StatusHistoryResponse(BaseModel):
     created_at: datetime
     changed_by: Optional[UserResponse] = None
 
-    class Config:
-        from_attributes = True
-
 class ReportSummary(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     complaint_id: str
     citizen_id: str
@@ -31,10 +32,9 @@ class ReportSummary(BaseModel):
     created_at: datetime
     citizen: Optional[UserResponse] = None
 
-    class Config:
-        from_attributes = True
-
 class IssueGroupResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     reference_code: str
     title: str
@@ -57,9 +57,6 @@ class IssueGroupResponse(BaseModel):
     reports: Optional[List[ReportSummary]] = []
     status_history: Optional[List[StatusHistoryResponse]] = []
 
-    class Config:
-        from_attributes = True
-
 class IssueVerifyRequest(BaseModel):
     priority: str
     verification_remarks: Optional[str] = None
@@ -71,4 +68,3 @@ class IssueMergeRequest(BaseModel):
 
 class IssueReopenRequest(BaseModel):
     reopen_reason: str
-

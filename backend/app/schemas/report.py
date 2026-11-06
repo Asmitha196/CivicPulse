@@ -1,6 +1,6 @@
 from typing import Optional, Any
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.schemas.category import CategoryResponse
 
 class ReportCreate(BaseModel):
@@ -13,6 +13,8 @@ class ReportCreate(BaseModel):
     image_url: Optional[str] = None
 
 class AISuggestionCompact(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     suggested_category_id: Optional[str] = None
     category_confidence: float
     suggested_priority: str
@@ -23,10 +25,9 @@ class AISuggestionCompact(BaseModel):
     distance_meters: Optional[float] = None
     model_name: str
 
-    class Config:
-        from_attributes = True
-
 class ReportResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     complaint_id: str
     citizen_id: str
@@ -43,7 +44,3 @@ class ReportResponse(BaseModel):
     updated_at: datetime
     category: Optional[CategoryResponse] = None
     ai_suggestion: Optional[AISuggestionCompact] = None
-
-    class Config:
-        from_attributes = True
-

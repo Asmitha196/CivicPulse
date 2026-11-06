@@ -17,6 +17,8 @@ from app.models import Base
 target_metadata = Base.metadata
 
 db_url = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/civicpulse")
+if db_url.startswith("postgresql://"):
+    db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
 config.set_main_option("sqlalchemy.url", db_url)
 
 def run_migrations_offline() -> None:

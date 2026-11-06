@@ -1,6 +1,6 @@
 from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from app.schemas.auth import UserResponse
 
 class FeedbackCreate(BaseModel):
@@ -11,6 +11,8 @@ class FeedbackCreate(BaseModel):
     reopen_reason: Optional[str] = None
 
 class FeedbackResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     issue_group_id: str
     citizen_id: str
@@ -20,7 +22,3 @@ class FeedbackResponse(BaseModel):
     reopen_reason: Optional[str] = None
     created_at: datetime
     citizen: Optional[UserResponse] = None
-
-    class Config:
-        from_attributes = True
-

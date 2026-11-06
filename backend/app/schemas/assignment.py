@@ -1,6 +1,6 @@
 from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.schemas.auth import UserResponse
 from app.schemas.issue_group import IssueGroupResponse
 
@@ -14,6 +14,8 @@ class AssignmentStatusUpdate(BaseModel):
     notes: Optional[str] = None
 
 class AssignmentResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     issue_group_id: str
     worker_id: str
@@ -26,7 +28,3 @@ class AssignmentResponse(BaseModel):
     worker: Optional[UserResponse] = None
     assigned_by: Optional[UserResponse] = None
     issue_group: Optional[IssueGroupResponse] = None
-
-    class Config:
-        from_attributes = True
-
