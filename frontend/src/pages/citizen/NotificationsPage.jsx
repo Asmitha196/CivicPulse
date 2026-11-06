@@ -9,9 +9,10 @@ const NotificationsPage = () => {
   const loadNotifications = async () => {
     try {
       const res = await notificationsService.getAll();
-      setNotifications(res.data || []);
+      setNotifications(Array.isArray(res?.data) ? res.data : []);
     } catch (err) {
       console.error(err);
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
@@ -21,10 +22,12 @@ const NotificationsPage = () => {
     loadNotifications();
   }, []);
 
+  const safeNotifications = Array.isArray(notifications) ? notifications : [];
+
   const handleMarkAllRead = async () => {
     try {
       await notificationsService.markAllRead();
-      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      setNotifications((prev) => (Array.isArray(prev) ? prev.map((n) => ({ ...n, is_read: true })) : []));
     } catch (err) {
       console.error(err);
     }
@@ -34,7 +37,7 @@ const NotificationsPage = () => {
     try {
       await notificationsService.markRead(id);
       setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+        (Array.isArray(prev) ? prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)) : [])
       );
     } catch (err) {
       console.error(err);
@@ -53,7 +56,7 @@ const NotificationsPage = () => {
           </p>
         </div>
 
-        {notifications.some((n) => !n.is_read) && (
+        {safeNotifications.some((n) => !n?.is_read) && (
           <button
             type="button"
             onClick={handleMarkAllRead}
@@ -68,7 +71,7 @@ const NotificationsPage = () => {
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden divide-y divide-slate-100">
         {loading ? (
           <div className="py-12 text-center text-xs text-slate-400">Loading notifications...</div>
-        ) : notifications.length === 0 ? (
+        ) : safeNotifications.length === 0 ? (
           <div className="py-16 text-center space-y-2">
             <Bell className="w-10 h-10 text-slate-300 mx-auto" />
             <h4 className="text-sm font-bold text-slate-800">No notifications yet</h4>
@@ -77,7 +80,7 @@ const NotificationsPage = () => {
             </p>
           </div>
         ) : (
-          notifications.map((notif) => (
+          safeNotifications.map((notif) => (
             <div
               key={notif.id}
               onClick={() => !notif.is_read && handleMarkRead(notif.id)}

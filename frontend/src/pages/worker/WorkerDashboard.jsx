@@ -23,9 +23,10 @@ const WorkerDashboard = () => {
     const loadTasks = async () => {
       try {
         const res = await assignmentsService.getMyTasks();
-        setTasks(res.data || []);
+        setTasks(Array.isArray(res?.data) ? res.data : []);
       } catch (err) {
         console.error(err);
+        setTasks([]);
       } finally {
         setLoading(false);
       }
@@ -33,14 +34,15 @@ const WorkerDashboard = () => {
     loadTasks();
   }, []);
 
-  const filteredTasks = tasks.filter((t) => {
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
+  const filteredTasks = safeTasks.filter((t) => {
     if (statusFilter === 'ALL') return true;
     return t.status === statusFilter;
   });
 
-  const activeCount = tasks.filter((t) => t.status === 'IN_PROGRESS' || t.status === 'PENDING' || t.status === 'ACCEPTED').length;
-  const submittedCount = tasks.filter((t) => t.status === 'SUBMITTED').length;
-  const completedCount = tasks.filter((t) => t.status === 'COMPLETED').length;
+  const activeCount = safeTasks.filter((t) => t.status === 'IN_PROGRESS' || t.status === 'PENDING' || t.status === 'ACCEPTED').length;
+  const submittedCount = safeTasks.filter((t) => t.status === 'SUBMITTED').length;
+  const completedCount = safeTasks.filter((t) => t.status === 'COMPLETED').length;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">

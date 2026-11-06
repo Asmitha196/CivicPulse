@@ -22,9 +22,10 @@ const MyComplaintsPage = () => {
     const fetchReports = async () => {
       try {
         const res = await reportsService.getMyReports();
-        setReports(res.data || []);
+        setReports(Array.isArray(res?.data) ? res.data : []);
       } catch (err) {
         console.error("Failed to fetch my complaints", err);
+        setReports([]);
       } finally {
         setLoading(false);
       }
@@ -32,7 +33,8 @@ const MyComplaintsPage = () => {
     fetchReports();
   }, []);
 
-  const filteredReports = reports.filter((r) => {
+  const safeReports = Array.isArray(reports) ? reports : [];
+  const filteredReports = safeReports.filter((r) => {
     const matchesSearch =
       r.title.toLowerCase().includes(search.toLowerCase()) ||
       r.complaint_id.toLowerCase().includes(search.toLowerCase()) ||

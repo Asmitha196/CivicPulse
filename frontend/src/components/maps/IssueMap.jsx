@@ -77,7 +77,9 @@ const IssueMap = ({ issues = [], height = '500px', center = [12.9716, 77.5946], 
   const [priorityFilter, setPriorityFilter] = React.useState('ALL');
   const [statusFilter, setStatusFilter] = React.useState('ALL');
 
-  const filteredIssues = issues.filter((iss) => {
+  const safeIssues = Array.isArray(issues) ? issues : [];
+
+  const filteredIssues = safeIssues.filter((iss) => {
     const matchesPriority =
       priorityFilter === 'ALL' ? true : iss.priority === priorityFilter;
     const matchesStatus =

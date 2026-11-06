@@ -31,10 +31,12 @@ const AdminReportsPage = () => {
           reportsService.getAll(),
           categoriesService.getAll()
         ]);
-        setReports(repRes.data || []);
-        setCategories(catRes.data || []);
+        setReports(Array.isArray(repRes?.data) ? repRes.data : []);
+        setCategories(Array.isArray(catRes?.data) ? catRes.data : []);
       } catch (err) {
         console.error(err);
+        setReports([]);
+        setCategories([]);
       } finally {
         setLoading(false);
       }
@@ -42,7 +44,9 @@ const AdminReportsPage = () => {
     fetchData();
   }, []);
 
-  const filteredReports = reports.filter((r) => {
+  const safeReports = Array.isArray(reports) ? reports : [];
+  const safeCategories = Array.isArray(categories) ? categories : [];
+  const filteredReports = safeReports.filter((r) => {
     const matchesSearch =
       r.title.toLowerCase().includes(search.toLowerCase()) ||
       r.complaint_id.toLowerCase().includes(search.toLowerCase()) ||
@@ -87,7 +91,7 @@ const AdminReportsPage = () => {
             className="px-3 py-2 text-xs border border-slate-300 rounded-xl outline-none bg-white text-slate-700"
           >
             <option value="">All Categories</option>
-            {categories.map((c) => (
+            {safeCategories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>

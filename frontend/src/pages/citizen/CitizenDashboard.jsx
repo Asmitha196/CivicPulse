@@ -27,10 +27,12 @@ const CitizenDashboard = () => {
           reportsService.getMyReports(),
           issuesService.getAll()
         ]);
-        setMyReports(repRes.data || []);
-        setAllIssues(issRes.data || []);
+        setMyReports(Array.isArray(repRes?.data) ? repRes.data : []);
+        setAllIssues(Array.isArray(issRes?.data) ? issRes.data : []);
       } catch (err) {
         console.error("Dashboard data load error", err);
+        setMyReports([]);
+        setAllIssues([]);
       } finally {
         setLoading(false);
       }
@@ -38,9 +40,10 @@ const CitizenDashboard = () => {
     loadDashboardData();
   }, []);
 
-  const totalReports = myReports.length;
-  const inProgressReports = myReports.filter((r) => r.status === 'LINKED' || r.status === 'SUBMITTED').length;
-  const resolvedReports = myReports.filter((r) => r.status === 'RESOLVED').length;
+  const safeReports = Array.isArray(myReports) ? myReports : [];
+  const totalReports = safeReports.length;
+  const inProgressReports = safeReports.filter((r) => r.status === 'LINKED' || r.status === 'SUBMITTED').length;
+  const resolvedReports = safeReports.filter((r) => r.status === 'RESOLVED').length;
 
   return (
     <div className="space-y-6">
@@ -154,13 +157,13 @@ const CitizenDashboard = () => {
             to="/citizen/complaints"
             className="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center"
           >
-            View all ({myReports.length})
+            View all ({safeReports.length})
             <ChevronRight className="w-4 h-4 ml-0.5" />
           </Link>
         </div>
 
         <div className="divide-y divide-slate-100">
-          {myReports.length === 0 ? (
+          {safeReports.length === 0 ? (
             <div className="py-12 text-center">
               <FileText className="w-10 h-10 text-slate-300 mx-auto mb-2" />
               <p className="text-sm font-semibold text-slate-700">No complaints reported yet</p>
@@ -175,7 +178,7 @@ const CitizenDashboard = () => {
               </Link>
             </div>
           ) : (
-            myReports.slice(0, 5).map((rep) => (
+            safeReports.slice(0, 5).map((rep) => (
               <div
                 key={rep.id}
                 className="p-4 sm:p-5 hover:bg-slate-50 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3"

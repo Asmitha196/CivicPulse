@@ -30,23 +30,27 @@ const Navbar = () => {
       const fetchNotifications = async () => {
         try {
           const res = await notificationsService.getAll();
-          setNotifications(res.data || []);
+          setNotifications(Array.isArray(res?.data) ? res.data : []);
         } catch (err) {
           console.error("Notifications fetch error", err);
+          setNotifications([]);
         }
       };
       fetchNotifications();
       const interval = setInterval(fetchNotifications, 15000);
       return () => clearInterval(interval);
+    } else {
+      setNotifications([]);
     }
   }, [isAuthenticated]);
 
-  const unreadCount = notifications.filter((n) => !n.is_read).length;
+  const safeNotifications = Array.isArray(notifications) ? notifications : [];
+  const unreadCount = safeNotifications.filter((n) => !n?.is_read).length;
 
   const handleMarkAllRead = async () => {
     try {
       await notificationsService.markAllRead();
-      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      setNotifications((prev) => (Array.isArray(prev) ? prev.map((n) => ({ ...n, is_read: true })) : []));
     } catch (err) {
       console.error(err);
     }
@@ -171,7 +175,7 @@ const Navbar = () => {
                     <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50">
                       <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
                         <span className="font-semibold text-sm text-slate-800">
-                          Notifications ({notifications.length})
+                          Notifications ({safeNotifications.length})
                         </span>
                         {unreadCount > 0 && (
                           <button
@@ -185,12 +189,12 @@ const Navbar = () => {
                       </div>
 
                       <div className="max-h-72 overflow-y-auto divide-y divide-slate-100">
-                        {notifications.length === 0 ? (
+                        {safeNotifications.length === 0 ? (
                           <div className="py-6 text-center text-xs text-slate-400">
                             No notifications yet
                           </div>
                         ) : (
-                          notifications.slice(0, 8).map((notif) => (
+                          safeNotifications.slice(0, 8).map((notif) => (
                             <div
                               key={notif.id}
                               className={`p-3 text-xs transition ${
